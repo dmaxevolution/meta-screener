@@ -1,11 +1,34 @@
+name: auto 17:00
+
 on:
   schedule:
-    - cron: '0 10 * * 1-5' # 17:00 WIB
+    - cron: '0 10 * * 1-5'  # 17:00 WIB Senin-Jumat
+  workflow_dispatch:
+
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - run: pip install openpyxl yfinance pandas
-      - run: python fetch-bei.py
-      - run: git config user.name "bot" && git add saham.xlsx && git commit -m "auto 17:00" && git push
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - run: pip install yfinance openpyxl pandas
+      
+      - name: Fetch BEI
+        run: python fetch-bei.py
+        
+      - name: Commit jika ada perubahan
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@shandy.com"
+          git add saham.xlsx
+          if git diff --staged --quiet; then
+            echo "Gak ada perubahan harga - BEI libur / yfinance error"
+            exit 0
+          else
+            git commit -m "auto 17:00"
+            git push
+          fi
