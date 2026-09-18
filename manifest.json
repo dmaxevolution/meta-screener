@@ -1,0 +1,23 @@
+{
+  "name": "SH4NDY V34 - Halaman 1 Screener + Halaman 2 Kartu 3 Mode",
+  "short_name": "SH4NDY V34",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "description": "V34 - Halaman 1 Screener + Halaman 2 Kartu 3 Mode - Hitam doff #0A0A0A #161616 signal hijau #22C55E merah #EF4444 blank 0 data.length actual PWA S hijau",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
