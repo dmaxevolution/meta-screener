@@ -1,0 +1,51 @@
+name: BEI Auto Fetch 17:00 WIB
+on:
+  schedule:
+    - cron: '0 10 * * 1-5' # 10 UTC = 17:00 WIB (WIB = UTC+7)
+  workflow_dispatch:
+
+jobs:
+  fetch-bei:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout bursa repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          pip install --upgrade pip
+          pip install yfinance openpyxl requests pandas lxml
+
+      - name: Load master 963 check
+        run: |
+          echo "master files:"
+          ls -lh master_*.txt || echo "no master yet"
+          wc -l master_*.txt || true
+          cat master_1.txt | head -20
+
+      - name: Run fetch-bei.py batch 30 jeda 15 menit
+        env:
+          CI_TEST: "0"
+        run: |
+          python fetch-bei.py
+          ls -lh saham.xlsx bursa/main/saham.xlsx || true
+
+      - name: Commit & push saham.xlsx to bursa/main
+        run: |
+          git config user.name "sh4ndy-bot"
+          git config user.email "bot@sh4ndy.id"
+          git add bursa/main/saham.xlsx saham.xlsx || true
+          git add master_*.txt || true
+          git diff --cached --quiet || git commit -m "auto: BEI close $(date +'%Y-%m-%d %H:%M WIB') - col10 HARGA - $(wc -l < master_1.txt 2>/dev/null || echo 0)+$(wc -l < master_2.txt 2>/dev/null || echo 0)+$(wc -l < master_3.txt 2>/dev/null || echo 0) actual"
+          git push || echo "no changes to push"
+
+      - name: Summary
+        run: |
+          echo "✅ Fetch selesai WIB $(date)"
+          echo "File: bursa/main/saham.xlsx siap di raw https://raw.githubusercontent.com/sh4ndy/bursa/main/saham.xlsx"
